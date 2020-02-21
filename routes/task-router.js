@@ -1,38 +1,36 @@
 const express = require('express');
 
-const db = require('./db-model.js');
+const Tasks = require('./db-model');
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-    try {
-        const tasks = await db.getTask();
-        res.json(tasks);
-    }
-    catch (err) {
-        res.status(500).json({ message: `Can't get all task`, err })
-    }
+// end points
+
+/* GET list of all tasks */
+router.get('/', (req, res) => {
+    Tasks.getTasks()
+        .then(tasks => {
+            res.status(200).json(tasks);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(400).json({ error: 'We could not retrieve the list of tasks.' });
+        })
 });
 
-router.get('/:id', async (req, res) => {
-    try {
-        const task = await db.getTaskById(req.params.id);
-        res.json(task)
-    }
-    catch (err) {
-        res.status(500).json({ message: `Task must have a valid id`, err })
-    }
-})
+/* POST to create a new task */
+router.post('/:id', (req, res) => {
 
-router.post('/', async (req, res) => {
-    const task = req.body
-    try {
-        const inserted = db.addTask(task, task.project_id);
-        res.json(inserted);
-    }
-    catch (err) {
-        res.status(500).json({ message: `Can't add task`, err })
-    }
-})
+    const id = req.params.id;
+    const newTask = { ...req.body, project_id: id };
+
+    Tasks.addTask(newTask)
+        .then(task => {
+            res.status(201).json(task);
+        })
+        .catch(err => {
+            res.status(400).json({ error: 'We could not create that task.' });
+        })
+});
 
 module.exports = router;

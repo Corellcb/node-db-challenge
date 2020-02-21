@@ -1,42 +1,35 @@
 const express = require('express');
 
-const db = require('./db-model.js');
+const Resources = require('./db-model');
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-    try {
-        const resources = await db.getResource();
-        res.json(resources);
-    }
-    catch (err) {
-        res.status(500).json({ message: `resource retrieval failed`, err })
-    }
+// endpoints
+
+/* GET list of resources */
+router.get('/', (req, res) => {
+    Resources.getResources()
+        .then(resources => {
+            res.status(200).json(resources);
+        })
+        .catch(err => {
+            res.status(400).json({ error: 'We could not retrieve the list of resources.' });
+        })
 });
 
-router.get('/:id', async (req, res) => {
-    try {
-        const resource = await db.getResourceById(req.params.id);
-        res.json(resource);
-    }
-    catch (err) {
-        res.status(500).json({ message: `Resource must have a valid ID` })
-    }
-})
+/* POST to create a new resource */
+router.post('/', (req, res) => {
 
-router.post('/', async (req, res) => {
-    const resource = req.body;
-    try {
-        if (!resource.resource_name) {
-            res.status(400).json({ message: 'Missing resource_name' })
-        } else {
-            const inserted = await db.addResource(resource);
-            res.json(inserted)
-        }
-    }
-    catch (err) {
-        res.status(500).json({ message: `Can't add resource`, err })
-    }
+    const newResource = req.body;
+    Resources.addResource(newResource)
+        .then(resource => {
+            res.status(201).json(resource);
+        })
+        .catch(err => {
+            res.status(400).json({ error: 'Resource could not be created.' });
+        })
 });
+
+
 
 module.exports = router;

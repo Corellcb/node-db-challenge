@@ -1,66 +1,41 @@
-const db = require('../data/db-config.js');
+const db = require('../data/db-config');
 
 module.exports = {
-    getProductByID,
-    getResourceById,
-    getTaskById,
-    getProduct,
-    getResource,
-    getTask,
-    addProduct,
+    getProjects,
+    addProject,
     addResource,
+    getResources,
+    getTasks,
     addTask
 };
 
-// get project/resource/task by ID
-
-function getProductByID(id) {
-    return db('project').where({ id }).first();
-};
-
-function getResourceById(id) {
-    return db('resource').where({ id }).first();
+/* GET list of projects */
+function getProjects() {
+    return db('projects');
 }
 
-function getTaskById(id) {
-    return db('task').where({ id }).first();
+/* POST to create a new project */
+function addProject(project) {
+    return db('projects').insert(project, 'id');
 }
 
-// get project/resource/task
+// POST to add a new resource
+function addResource(resource) {
+    return db('resources').insert(resource, 'id');
+}
 
-function getProduct() {
-    return db('project');
-};
+function getResources() {
+    return db('resources');
+}
 
-function getResource() {
-    return db('resource');
-};
+/* GET list of tasks */
+function getTasks() {
+    return db('tasks')
+        .join('projects', 'tasks.project_id', 'projects.id')
+        .select('tasks.*', 'projects.project_name', 'projects.project_description')
+}
 
-function getTask() {
-    return db('task as t')
-        .join('project as p', 't.project_id', 'p.id')
-        .select('t.*', 'p.project_name', 'p.project_desc')
-};
-
-// add project/resource/task
-
-function addProduct(projectData) {
-    return db('project').insert(projectData)
-        .then(arr => {
-            return getProductByID(arr[0]);
-        })
-};
-
-function addResource(resourceData) {
-    return db('resource').insert(resourceData)
-        .then(arr => {
-            return getResourceById(arr[0]);
-        })
-};
-
-function addTask(taskData, project_id) {
-    return db('task').insert(taskData, project_id)
-        .then(arr => {
-            return getTaskById(arr[0]);
-        })
+/* POST to create a new task */
+function addTask(task) {
+    return db('tasks').insert(task, 'id');
 }
