@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
             res.status(201).json(project);
         })
         .catch(err => {
-            res.status(400).json({ error: 'We could not create that project.' });
+            res.status(400).json({ error: 'Could not add that project.' });
         })
 });
 

@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
             res.status(201).json(resource);
         })
         .catch(err => {
-            res.status(400).json({ error: 'Resource could not be created.' });
+            res.status(400).json({ error: 'Resource could not be added.' });
         })
 });
 
